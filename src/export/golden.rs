@@ -1,9 +1,9 @@
 use serde_json::{Value, json};
 
-use crate::coord::{GerberFileImage, Vec2I};
 use crate::dcode::DCode;
-use crate::draw_item::DrawItem;
-use crate::geometry::{Box2I, PolySet};
+use crate::gerber_draw_item::DrawItem;
+use crate::gerber_file_image::GerberFileImage;
+use crate::geometry::{Box2I, PolySet, Vec2I};
 use crate::netlist_metadata::NetlistMetadata;
 use crate::types::{ApertureHoleType, ApertureType, ShapeType};
 

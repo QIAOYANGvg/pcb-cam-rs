@@ -22,8 +22,8 @@ outer outline and the remaining contours are holes.
 
 The former C++ bridge remains in the repository for reference:
 
-- `cpp/clipper_bridge.cpp`
-- `cpp/clipper_bridge.h`
+- `reference/clipper2_bridge/clipper_bridge.cpp`
+- `reference/clipper2_bridge/clipper_bridge.h`
 - `../thirdparty/clipper2/Clipper2Lib`
 
 These files are no longer compiled by Cargo. The old Rust FFI module and Cargo

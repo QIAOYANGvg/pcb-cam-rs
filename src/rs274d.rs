@@ -1,8 +1,12 @@
 //! RS-274D command execution.
 //! Ported from KiCad gerbview/rs274d.cpp.
 
-use crate::coord::{GerberFileImage, Vec2I, scale_to_iu};
-use crate::draw_item::DrawItem;
+use crate::gerber_draw_item::DrawItem;
+use crate::gerber_file_image::GerberFileImage;
+use crate::geometry::{
+    Vec2I, add, angle_degrees, euclidean_norm, get_arc_to_segment_count, neg, rotate_point, sub,
+};
+use crate::rs274_read_xy_and_ij_coordinates::scale_to_iu;
 use crate::rs274x::{CommandResult, execute_rs274x_command, read_x_command_id};
 use crate::types::{ApertureType, FIRST_DCODE, Interpolation, ShapeType};
 
@@ -23,8 +27,6 @@ pub const GC_SPECIFY_ABSOLUTE_COORD: i32 = 90;
 pub const GC_SPECIFY_RELATIVE_COORD: i32 = 91;
 
 const ARC_APPROX_ERROR_MAX: i32 = 500;
-const MIN_SEGCOUNT_FOR_CIRCLE: f64 = 8.0;
-
 pub fn code_number(text: &str, offset: usize) -> (i32, usize) {
     let bytes = text.as_bytes();
     let start = offset.saturating_add(1);
@@ -648,37 +650,6 @@ fn append_polygon_point(outline: &mut Vec<Vec2I>, point: Vec2I) {
     }
 }
 
-fn get_arc_to_segment_count(radius: i32, error_max: i32, arc_angle: f64) -> i32 {
-    let radius = radius.max(1);
-    let error_max = error_max.max(1);
-    let rel_error = error_max as f64 / radius as f64;
-    let cos_arg = (1.0 - rel_error).clamp(-1.0, 1.0);
-    let arc_increment =
-        (180.0 / std::f64::consts::PI * cos_arg.acos() * 2.0).min(360.0 / MIN_SEGCOUNT_FOR_CIRCLE);
-    let seg_count = (arc_angle.abs() / arc_increment).round() as i32;
-
-    seg_count.max(2)
-}
-
-fn rotate_point(point: Vec2I, angle_degrees: f64) -> Vec2I {
-    let angle = angle_degrees.to_radians();
-    let sin = angle.sin();
-    let cos = angle.cos();
-
-    Vec2I::new(
-        (point.x as f64 * cos - point.y as f64 * sin).round() as i32,
-        (point.x as f64 * sin + point.y as f64 * cos).round() as i32,
-    )
-}
-
-fn angle_degrees(point: Vec2I) -> f64 {
-    (point.y as f64).atan2(point.x as f64).to_degrees()
-}
-
-fn euclidean_norm(point: Vec2I) -> i32 {
-    ((point.x as f64).hypot(point.y as f64)).round() as i32
-}
-
 fn skip_to_end_of_block(text: &str, mut pos: usize) -> usize {
     while pos < text.len() && byte_at(text, pos) != Some(b'*') {
         pos += 1;
@@ -688,18 +659,6 @@ fn skip_to_end_of_block(text: &str, mut pos: usize) -> usize {
 
 fn byte_at(text: &str, pos: usize) -> Option<u8> {
     text.as_bytes().get(pos).copied()
-}
-
-fn add(a: Vec2I, b: Vec2I) -> Vec2I {
-    Vec2I::new(a.x + b.x, a.y + b.y)
-}
-
-fn sub(a: Vec2I, b: Vec2I) -> Vec2I {
-    Vec2I::new(a.x - b.x, a.y - b.y)
-}
-
-fn neg(a: Vec2I) -> Vec2I {
-    Vec2I::new(-a.x, -a.y)
 }
 
 #[cfg(test)]

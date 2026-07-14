@@ -1,8 +1,9 @@
 /// Gerber draw item — a single drawable element.
 /// Ported from KiCad gerber_draw_item.h / gerber_draw_item.cpp
-use crate::coord::Vec2I;
 use crate::dcode::DCode;
-use crate::geometry::{Box2I, PolySet, add, angle_degrees, distance, ki_round, rotate_point, sub};
+use crate::geometry::{
+    Box2I, PolySet, Vec2I, add, angle_degrees, distance, ki_round, rotate_point, sub,
+};
 use crate::netlist_metadata::NetlistMetadata;
 use crate::types::{ApertureType, ShapeType};
 

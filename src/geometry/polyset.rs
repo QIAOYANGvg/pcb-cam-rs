@@ -1,16 +1,12 @@
 //! Minimal KiCad-like geometry helpers for Gerber polygon and bounding-box work.
 
-use std::cmp::Ordering;
-
 use i_overlay::core::fill_rule::FillRule;
 use i_overlay::core::overlay::{ContourDirection, IntOverlayOptions, Overlay, ShapeType};
 use i_overlay::core::overlay_rule::OverlayRule;
 use i_overlay::core::solver::Solver;
 use i_overlay::i_float::int::point::IntPoint;
 
-use crate::coord::Vec2I;
-
-const MIN_SEGCOUNT_FOR_CIRCLE: f64 = 8.0;
+use super::vector::{add, rotate_point, Vec2I};
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct Box2I {
@@ -177,14 +173,6 @@ impl PolySet {
         *self = overlay_boolean_op(self, &PolySet::new(), OverlayRule::Union);
     }
 
-    pub fn fracture(&mut self) {
-        self.simplify();
-
-        for polygon in &mut self.polygons {
-            fracture_polygon(polygon);
-        }
-    }
-
     pub fn move_by(&mut self, delta: Vec2I) {
         for poly in &mut self.polygons {
             for point in &mut poly.outline {
@@ -248,18 +236,6 @@ impl PolySet {
             .map(|poly| poly.outline.clone())
             .collect()
     }
-}
-
-pub fn add(a: Vec2I, b: Vec2I) -> Vec2I {
-    Vec2I::new(a.x + b.x, a.y + b.y)
-}
-
-pub fn sub(a: Vec2I, b: Vec2I) -> Vec2I {
-    Vec2I::new(a.x - b.x, a.y - b.y)
-}
-
-pub fn neg(a: Vec2I) -> Vec2I {
-    Vec2I::new(-a.x, -a.y)
 }
 
 fn ring_has_area(points: &[Vec2I]) -> bool {
@@ -386,217 +362,6 @@ fn overlay_boolean_op(subject: &PolySet, clip: &PolySet, rule: OverlayRule) -> P
     PolySet { polygons }
 }
 
-#[derive(Clone, Copy, Default)]
-struct FractureEdge {
-    p1: Vec2I,
-    p2: Vec2I,
-    next: usize,
-}
-
-impl FractureEdge {
-    fn new(p1: Vec2I, p2: Vec2I, next: usize) -> Self {
-        Self { p1, p2, next }
-    }
-
-    fn matches(self, y: i32) -> bool {
-        (y >= self.p1.y || y >= self.p2.y) && (y <= self.p1.y || y <= self.p2.y)
-    }
-}
-
-#[derive(Clone, Copy)]
-struct FracturePathInfo {
-    path_or_provoking_index: usize,
-    leftmost: usize,
-    x: i32,
-    y_or_bridge: i64,
-}
-
-fn fracture_polygon(polygon: &mut Polygon) {
-    if polygon.holes.is_empty() {
-        return;
-    }
-
-    let mut paths = Vec::with_capacity(polygon.holes.len() + 1);
-    paths.push(polygon.outline.clone());
-    paths.extend(polygon.holes.iter().cloned());
-
-    if paths.iter().any(Vec::is_empty) {
-        return;
-    }
-
-    let total_point_count = paths.iter().map(Vec::len).sum::<usize>();
-    let mut edges =
-        Vec::with_capacity(total_point_count.saturating_add(paths.len().saturating_mul(3)));
-    let mut sorted_paths = Vec::with_capacity(paths.len());
-
-    for (path_index, path) in paths.iter().enumerate() {
-        let mut x_min = i32::MAX;
-        let mut y_min = i32::MAX;
-        let mut leftmost = 0;
-
-        for (point_index, point) in path.iter().enumerate() {
-            if point.x < x_min {
-                x_min = point.x;
-                leftmost = point_index;
-            }
-
-            if point.y < y_min {
-                y_min = point.y;
-            }
-        }
-
-        sorted_paths.push(FracturePathInfo {
-            path_or_provoking_index: path_index,
-            leftmost,
-            x: x_min,
-            y_or_bridge: y_min as i64,
-        });
-    }
-
-    sorted_paths[1..].sort_unstable_by(|a, b| match a.x.cmp(&b.x) {
-        Ordering::Equal => a.y_or_bridge.cmp(&b.y_or_bridge),
-        ordering => ordering,
-    });
-
-    let mut edge_index = 0;
-
-    for (sorted_index, path_info) in sorted_paths.iter_mut().enumerate() {
-        let path = &paths[path_info.path_or_provoking_index];
-        let provoking_edge = edge_index;
-
-        for index in 0..path.len() - 1 {
-            edges.push(FractureEdge::new(
-                path[index],
-                path[index + 1],
-                edge_index + 1,
-            ));
-            edge_index += 1;
-        }
-
-        edges.push(FractureEdge::new(
-            path[path.len() - 1],
-            path[0],
-            provoking_edge,
-        ));
-        edge_index += 1;
-
-        if sorted_index > 0 {
-            path_info.path_or_provoking_index = provoking_edge;
-            path_info.y_or_bridge = edge_index as i64;
-            edge_index += 3;
-            edges.resize(edge_index, FractureEdge::default());
-        }
-    }
-
-    for path_info in sorted_paths.iter().skip(1) {
-        let edge_index = path_info.path_or_provoking_index + path_info.leftmost;
-
-        if !process_hole(
-            &mut edges,
-            path_info.path_or_provoking_index,
-            edge_index,
-            path_info.y_or_bridge as usize,
-        ) {
-            return;
-        }
-    }
-
-    let mut outline = Vec::with_capacity(edges.len());
-    let mut current_index = 0;
-
-    loop {
-        let edge = edges[current_index];
-
-        if outline.last().copied() != Some(edge.p1) {
-            outline.push(edge.p1);
-        }
-
-        if edge.next == 0 {
-            break;
-        }
-
-        current_index = edge.next;
-    }
-
-    polygon.outline = outline;
-    polygon.holes.clear();
-}
-
-fn process_hole(
-    edges: &mut [FractureEdge],
-    provoking_index: usize,
-    edge_index: usize,
-    bridge_index: usize,
-) -> bool {
-    let edge = edges[edge_index];
-    let x = edge.p1.x;
-    let y = edge.p1.y;
-    let mut min_dist = i32::MAX;
-    let mut x_nearest = 0;
-    let mut nearest_index = None;
-
-    for (index, candidate) in edges.iter().copied().enumerate().take(provoking_index) {
-        if !candidate.matches(y) {
-            continue;
-        }
-
-        let x_intersect = if candidate.p1.y == candidate.p2.y {
-            candidate.p1.x.max(candidate.p2.x)
-        } else {
-            candidate.p1.x
-                + rescale_i32(
-                    candidate.p2.x - candidate.p1.x,
-                    y - candidate.p1.y,
-                    candidate.p2.y - candidate.p1.y,
-                )
-        };
-        let dist = x - x_intersect;
-
-        if dist >= 0 && dist < min_dist {
-            min_dist = dist;
-            x_nearest = x_intersect;
-            nearest_index = Some(index);
-        }
-    }
-
-    let Some(nearest_index) = nearest_index else {
-        return false;
-    };
-
-    let outline_to_hole = bridge_index;
-    let hole_to_outline = bridge_index + 1;
-    let split = bridge_index + 2;
-    let nearest = edges[nearest_index];
-    let bridge_point = Vec2I::new(x_nearest, y);
-
-    edges[outline_to_hole] = FractureEdge::new(bridge_point, edge.p1, edge_index);
-    edges[hole_to_outline] = FractureEdge::new(edge.p1, bridge_point, split);
-    edges[split] = FractureEdge::new(bridge_point, nearest.p2, nearest.next);
-    edges[nearest_index].p2 = bridge_point;
-    edges[nearest_index].next = outline_to_hole;
-
-    let mut last_index = edge_index;
-
-    while edges[last_index].next != edge_index {
-        last_index = edges[last_index].next;
-    }
-
-    edges[last_index].next = hole_to_outline;
-    true
-}
-
-fn rescale_i32(numerator: i32, value: i32, denominator: i32) -> i32 {
-    let product = numerator as i64 * value as i64;
-    let denominator = denominator as i64;
-    let rounded = if (product < 0) ^ (denominator < 0) {
-        product - denominator / 2
-    } else {
-        product + denominator / 2
-    };
-
-    (rounded / denominator) as i32
-}
-
 impl PolySet {
     fn contour_count(&self) -> usize {
         self.polygons
@@ -604,115 +369,6 @@ impl PolySet {
             .map(|poly| 1_usize.saturating_add(poly.holes.len()))
             .sum()
     }
-}
-
-pub fn scale(a: Vec2I, factor: f64) -> Vec2I {
-    Vec2I::new(ki_round(a.x as f64 * factor), ki_round(a.y as f64 * factor))
-}
-
-pub fn ki_round(value: f64) -> i32 {
-    value.round() as i32
-}
-
-pub fn distance(a: Vec2I, b: Vec2I) -> f64 {
-    let dx = (a.x - b.x) as f64;
-    let dy = (a.y - b.y) as f64;
-    (dx * dx + dy * dy).sqrt()
-}
-
-pub fn euclidean_norm(point: Vec2I) -> i32 {
-    ki_round(((point.x as f64).powi(2) + (point.y as f64).powi(2)).sqrt())
-}
-
-pub fn angle_degrees(point: Vec2I) -> f64 {
-    (point.y as f64).atan2(point.x as f64).to_degrees()
-}
-
-pub fn rotate_point(point: Vec2I, angle_degrees: f64) -> Vec2I {
-    let angle = angle_degrees.to_radians();
-    let sin = angle.sin();
-    let cos = angle.cos();
-    let x = point.x as f64;
-    let y = point.y as f64;
-
-    Vec2I::new(ki_round(x * cos - y * sin), ki_round(x * sin + y * cos))
-}
-
-pub fn get_arc_to_segment_count(radius: i32, error_max: i32, arc_angle: f64) -> i32 {
-    let radius = radius.max(1);
-    let error_max = error_max.max(1);
-    let rel_error = error_max as f64 / radius as f64;
-    let cos_arg = (1.0 - rel_error).clamp(-1.0, 1.0);
-    let arc_increment =
-        (180.0 / std::f64::consts::PI * cos_arg.acos() * 2.0).min(360.0 / MIN_SEGCOUNT_FOR_CIRCLE);
-    let seg_count = (arc_angle.abs() / arc_increment).round() as i32;
-
-    seg_count.max(2)
-}
-
-pub fn circle_to_polygon(radius: i32, seg_count: usize) -> Vec<Vec2I> {
-    let count = seg_count.max(8);
-    circle_to_polygon_count(radius, count)
-}
-
-pub fn circle_to_polygon_by_error(radius: i32, error_max: i32) -> Vec<Vec2I> {
-    let mut count = get_arc_to_segment_count(radius, error_max, 360.0).max(8) as usize;
-    count = count.div_ceil(8) * 8;
-    circle_to_polygon_count(radius, count)
-}
-
-fn circle_to_polygon_count(radius: i32, count: usize) -> Vec<Vec2I> {
-    let delta = 360.0 / count as f64;
-    let mut outline = Vec::with_capacity(count + 1);
-
-    for ii in 0..count {
-        let angle = delta / 2.0 + delta * ii as f64;
-        outline.push(rotate_point(Vec2I::new(radius, 0), angle));
-    }
-
-    if let Some(first) = outline.first().copied() {
-        outline.push(first);
-    }
-
-    outline
-}
-
-pub fn rectangle_to_polygon(size: Vec2I) -> Vec<Vec2I> {
-    let mut curr = Vec2I::new(size.x / 2, size.y / 2);
-    let initial = curr;
-
-    vec![
-        curr,
-        {
-            curr.x -= size.x;
-            curr
-        },
-        {
-            curr.y -= size.y;
-            curr
-        },
-        {
-            curr.x += size.x;
-            curr
-        },
-        {
-            curr.y += size.y;
-            curr
-        },
-        initial,
-    ]
-}
-
-pub fn regular_polygon_to_polygon(radius: i32, edges: i32, rotation_degrees: f64) -> Vec<Vec2I> {
-    let edges = edges.max(3) as usize;
-    let mut outline = Vec::with_capacity(edges);
-
-    for ii in 0..edges {
-        let angle = 360.0 * ii as f64 / edges as f64 - rotation_degrees;
-        outline.push(rotate_point(Vec2I::new(radius, 0), angle));
-    }
-
-    outline
 }
 
 #[cfg(test)]

@@ -5,7 +5,7 @@
 /// - Immediate values: 3.5
 /// - Deferred values: $2 (replace with value from ADD command)
 /// - Arithmetic expressions: $2/2+1
-use crate::coord::{read_double, read_int};
+use crate::rs274_read_xy_and_ij_coordinates::{read_double, read_int};
 
 /// Operator/operand types for the stack-based evaluation machine
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]

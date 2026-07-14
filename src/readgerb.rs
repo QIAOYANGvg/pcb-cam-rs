@@ -4,7 +4,7 @@
 use std::fs;
 use std::path::Path;
 
-use crate::coord::GerberFileImage;
+use crate::gerber_file_image::GerberFileImage;
 use crate::rs274d::{code_number, execute_dcode_command, execute_g_command};
 use crate::rs274x::read_rs274x_command;
 use crate::types::CommandState;

@@ -1,5 +1,4 @@
-use gerber_parse::coord::Vec2I;
-use gerber_parse::geometry::{PolySet, Polygon};
+use gerber_parse::geometry::{PolySet, Polygon, Vec2I};
 
 #[derive(Clone, Copy)]
 enum BooleanOperation {

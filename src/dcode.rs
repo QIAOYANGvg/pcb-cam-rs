@@ -2,10 +2,9 @@
 /// Ported from KiCad dcode.h / dcode.cpp
 ///
 /// A gerber D-code (also called Aperture) defines a shape that can be flashed.
-use crate::coord::Vec2I;
 use crate::geometry::{
-    PolySet, circle_to_polygon_by_error, rectangle_to_polygon, regular_polygon_to_polygon,
-    rotate_point,
+    PolySet, Vec2I, circle_to_polygon_by_error, rectangle_to_polygon,
+    regular_polygon_to_polygon, rotate_point,
 };
 use crate::types::{ApertureHoleType, ApertureType, FIRST_DCODE};
 

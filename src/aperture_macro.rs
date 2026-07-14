@@ -8,8 +8,7 @@ use std::collections::BTreeMap;
 
 use crate::am_param::{AmParam, AmParams};
 use crate::am_primitive::{AmPrimitive, AmPrimitiveId};
-use crate::coord::Vec2I;
-use crate::geometry::{PolySet, add};
+use crate::geometry::{PolySet, Vec2I, add};
 
 /// An aperture macro definition containing a list of primitives and local parameters.
 #[derive(Clone, Debug)]

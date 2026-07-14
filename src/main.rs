@@ -1,8 +1,8 @@
 use std::env;
 use std::path::{Path, PathBuf};
 
-use gerber_parse::gerber_parser::load_gerber_file;
-use gerber_parse::golden_export::export_golden_json;
+use gerber_parse::export::golden::export_golden_json;
+use gerber_parse::readgerb::load_gerber_file;
 
 fn main() {
     let mut args = env::args_os().skip(1).collect::<Vec<_>>();

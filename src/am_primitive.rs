@@ -4,10 +4,10 @@
 /// Aperture macro primitives are basic shapes which can be combined to create
 /// a complex shape that is flashed.
 use crate::am_param::AmParam;
-use crate::coord::{Vec2I, scale_to_iu};
 use crate::geometry::{
-    PolySet, add, circle_to_polygon_by_error, euclidean_norm, rotate_point, sub,
+    PolySet, Vec2I, add, circle_to_polygon_by_error, euclidean_norm, rotate_point, sub,
 };
+use crate::rs274_read_xy_and_ij_coordinates::scale_to_iu;
 
 /// Aperture macro primitive IDs
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]

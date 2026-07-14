@@ -4,11 +4,13 @@
 use crate::am_param::AmParam;
 use crate::am_primitive::{AmPrimitive, AmPrimitiveId};
 use crate::aperture_macro::ApertureMacro;
-use crate::coord::{GerberFileImage, Vec2I, read_double, read_int, scale_to_iu};
 use crate::dcode::DCode;
+use crate::gerber_file_image::GerberFileImage;
+use crate::geometry::Vec2I;
 use crate::netlist_metadata::{GBR_NETINFO_CMP, GBR_NETINFO_NET, GBR_NETINFO_PAD};
+use crate::rs274_read_xy_and_ij_coordinates::{read_double, read_int, scale_to_iu};
 use crate::types::{ApertureHoleType, ApertureType, CommandState, Interpolation};
-use crate::x2_attribute::{X2Attribute, X2AttributeFileFunction};
+use crate::x2_gerber_attributes::{X2Attribute, X2AttributeFileFunction};
 
 pub const fn code(x: u8, y: u8) -> i32 {
     ((x as i32) << 8) + y as i32
