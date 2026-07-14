@@ -5,7 +5,8 @@
 /// a complex shape that is flashed.
 use crate::am_param::AmParam;
 use crate::geometry::{
-    PolySet, Vec2I, add, circle_to_polygon_by_error, euclidean_norm, rotate_point, sub,
+    PolySet, Vec2I, add, circle_to_polygon_by_error, circle_to_polygon_by_error_outside,
+    euclidean_norm, rotate_point, sub,
 };
 use crate::rs274_read_xy_and_ij_coordinates::scale_to_iu;
 
@@ -353,7 +354,7 @@ impl AmPrimitive {
                 );
                 let mut hole = PolySet::new();
                 hole.add_outline(
-                    circle_to_polygon_by_error((outer_diam - pen_thickness * 2) / 2, 500)
+                    circle_to_polygon_by_error_outside((outer_diam - pen_thickness * 2) / 2, 500)
                         .into_iter()
                         .map(|point| add(point, center))
                         .collect(),

@@ -1,0 +1,638 @@
+{
+  "commit": "64bd2ab74e6dde92aec54052893317d1b80b3ecc",
+  "count": 105,
+  "digest": "bbfd165f6cfeb618ae1fdd1aaf3bb08d83404be6c048795c33a1fd171e6d8be7",
+  "files": [
+    {
+      "sha256": "8a319610d4c6a184401e20e965f46e55c36319d4b78d30db9bd99fc111e8b66a",
+      "size": 52597,
+      "source": "boards/8bit-mixtape/mixtape.gbl",
+      "staged": "boards__8bit-mixtape__mixtape__gbl.gbl"
+    },
+    {
+      "sha256": "f1e563caf24cba797574d2b7bf5c55e9463e77762355307084cf9d1938a2b29c",
+      "size": 27338,
+      "source": "boards/8bit-mixtape/mixtape.gbo",
+      "staged": "boards__8bit-mixtape__mixtape__gbo.gbo"
+    },
+    {
+      "sha256": "7e7f8712926ee3935ba893823e1bb4d0262fe129804d94570eab61244cf91aa0",
+      "size": 4816,
+      "source": "boards/8bit-mixtape/mixtape.gbp",
+      "staged": "boards__8bit-mixtape__mixtape__gbp.gbp"
+    },
+    {
+      "sha256": "6c4a202f6f2dcb81ab2ae639f1ebad6577b892928588dbeb9d473bbc973543ff",
+      "size": 5382,
+      "source": "boards/8bit-mixtape/mixtape.gbs",
+      "staged": "boards__8bit-mixtape__mixtape__gbs.gbs"
+    },
+    {
+      "sha256": "f90adab7fa9b2d7268a8eaf163a061dd6983b47528f91e0bc6dd55d6d59f42f2",
+      "size": 5196,
+      "source": "boards/8bit-mixtape/mixtape.gml",
+      "staged": "boards__8bit-mixtape__mixtape__gml.gml"
+    },
+    {
+      "sha256": "bba2239b7df82d3baf92f5a736c5410642fe7046d52c72c1eb7c1e26eb304737",
+      "size": 33966,
+      "source": "boards/8bit-mixtape/mixtape.gtl",
+      "staged": "boards__8bit-mixtape__mixtape__gtl.gtl"
+    },
+    {
+      "sha256": "550bfc029a84cc99e31dd1abf597ee8faf1752261ff7b111bd92551d6aa3c2ad",
+      "size": 502841,
+      "source": "boards/8bit-mixtape/mixtape.gto",
+      "staged": "boards__8bit-mixtape__mixtape__gto.gto"
+    },
+    {
+      "sha256": "004071e854180773ed61b514b8b4a3c909eb82792b5bf1b59036acead5d4f42a",
+      "size": 14406,
+      "source": "boards/8bit-mixtape/mixtape.gtp",
+      "staged": "boards__8bit-mixtape__mixtape__gtp.gtp"
+    },
+    {
+      "sha256": "5160774524f45023baf4f2e0fba70cbfa0368d8e17df5274532faaaf220d3060",
+      "size": 17702,
+      "source": "boards/8bit-mixtape/mixtape.gts",
+      "staged": "boards__8bit-mixtape__mixtape__gts.gts"
+    },
+    {
+      "sha256": "9aeffecc8736400306d8096a9548d327b0d03c2f88cdbbef1410073faf8b07cb",
+      "size": 7321,
+      "source": "boards/arduino-uno/arduino-uno.gko",
+      "staged": "boards__arduino-uno__arduino-uno__gko.gko"
+    },
+    {
+      "sha256": "dce9f05e236a3d75f0ef24dd7bf08fc10bf7fa04f29f09678463f6fef2f9d0a2",
+      "size": 12904,
+      "source": "boards/bus-pirate/BusPirate-v3.6a-SSOP.gko",
+      "staged": "boards__bus-pirate__BusPirate-v3.6a-SSOP__gko.gko"
+    },
+    {
+      "sha256": "65917278891f64bb8aaa0fe7df327795003d01e0adeb79268b6f2b9bcde2d34a",
+      "size": 131642,
+      "source": "boards/clockblock/clockblock-B_Cu.gbr",
+      "staged": "boards__clockblock__clockblock-B_Cu__gbr.gbr"
+    },
+    {
+      "sha256": "0d0d16fb6661ab7d36d2eeb1c67c70b738dbe568008da969fb97f054db01218d",
+      "size": 945,
+      "source": "boards/clockblock/clockblock-B_Mask.gbr",
+      "staged": "boards__clockblock__clockblock-B_Mask__gbr.gbr"
+    },
+    {
+      "sha256": "1aa023e358a3b188a5d1cb3e57df5091333ecb33f68e839481c43eb961fa7541",
+      "size": 23400,
+      "source": "boards/clockblock/clockblock-B_SilkS.gbr",
+      "staged": "boards__clockblock__clockblock-B_SilkS__gbr.gbr"
+    },
+    {
+      "sha256": "d01361f551a96ff8162a1c62ebdb77018b4f5e12b8a92737c3a5bc4da9c00bdc",
+      "size": 1506,
+      "source": "boards/clockblock/clockblock-Edge_Cuts.gbr",
+      "staged": "boards__clockblock__clockblock-Edge_Cuts__gbr.gbr"
+    },
+    {
+      "sha256": "05c4b840759aa87e3e5b7703827823baf46814a335c9fa562a8fd4998036ef47",
+      "size": 291423,
+      "source": "boards/clockblock/clockblock-F_Cu.gbr",
+      "staged": "boards__clockblock__clockblock-F_Cu__gbr.gbr"
+    },
+    {
+      "sha256": "6d89242c978de463fb2ea1b1a39c69e5e2e4624da38f111a824ef4b3efc294a7",
+      "size": 11434,
+      "source": "boards/clockblock/clockblock-F_Mask.gbr",
+      "staged": "boards__clockblock__clockblock-F_Mask__gbr.gbr"
+    },
+    {
+      "sha256": "1717f9a40217c5b9ba17bdea17b63b1cf52bdb5b29a58666c0c13fa0c0462269",
+      "size": 10437,
+      "source": "boards/clockblock/clockblock-F_Paste.gbr",
+      "staged": "boards__clockblock__clockblock-F_Paste__gbr.gbr"
+    },
+    {
+      "sha256": "60837c81c95848c1cf69a3095ab6b38c6ddb1c23782740568bca16cca8754eef",
+      "size": 215762,
+      "source": "boards/clockblock/clockblock-F_SilkS.gbr",
+      "staged": "boards__clockblock__clockblock-F_SilkS__gbr.gbr"
+    },
+    {
+      "sha256": "fcfe20259ca48b9798e86f3b936f512f4cca022049e02aaf974604f91be2412c",
+      "size": 29821,
+      "source": "boards/core/core.GBL",
+      "staged": "boards__core__core__gbl.gbl"
+    },
+    {
+      "sha256": "1d7c5d11403d4d67e671406ad8fd47fbd8aa0d011e87263d42b7159461215bd6",
+      "size": 7976,
+      "source": "boards/core/core.GBO",
+      "staged": "boards__core__core__gbo.gbo"
+    },
+    {
+      "sha256": "545640f8fa4f07a193ec4b63cc052df59fe135d13ad0434379c5adf6c861f0d8",
+      "size": 6925,
+      "source": "boards/core/core.GBP",
+      "staged": "boards__core__core__gbp.gbp"
+    },
+    {
+      "sha256": "6198a68c95e6e80519c20de5999e0cb0b21aaef99d5fdc052df5cfed2c7184b8",
+      "size": 7561,
+      "source": "boards/core/core.GBS",
+      "staged": "boards__core__core__gbs.gbs"
+    },
+    {
+      "sha256": "8efda7f3c11e9ec0a385b4668c33ceef44b8da51d0efb154f54a73c9f274a72a",
+      "size": 36331,
+      "source": "boards/core/core.GTL",
+      "staged": "boards__core__core__gtl.gtl"
+    },
+    {
+      "sha256": "f9fbacc1d78ed1cb19fa2689f2e7ba071219a652af48cef225a547e24dcdb32d",
+      "size": 17021,
+      "source": "boards/core/core.GTO",
+      "staged": "boards__core__core__gto.gto"
+    },
+    {
+      "sha256": "9903e07b2a4c7c5620e565e6d557da96fd454ab760509253214ad0a047e9d9e3",
+      "size": 2266,
+      "source": "boards/core/core.GTP",
+      "staged": "boards__core__core__gtp.gtp"
+    },
+    {
+      "sha256": "cbf1aa0fb36953d30a98a8625f2fe6d8a074e6252c0df6cf572b599267ef0011",
+      "size": 11246,
+      "source": "boards/core/core.GTS",
+      "staged": "boards__core__core__gts.gts"
+    },
+    {
+      "sha256": "c3a4dc5c77f2b8f6404bd8d963dd3cfe002dfd9685e72eed9868e32fc786a3a7",
+      "size": 135722,
+      "source": "boards/mchck/mchck-B_Cu.pho",
+      "staged": "boards__mchck__mchck-B_Cu__pho.pho"
+    },
+    {
+      "sha256": "788a2b5618e74cf247c7427980158246d5af44c913a7ffa6f07eb38b824f77e9",
+      "size": 33065,
+      "source": "boards/mchck/mchck-B_Mask.pho",
+      "staged": "boards__mchck__mchck-B_Mask__pho.pho"
+    },
+    {
+      "sha256": "aa52074b3b829c86db3fca181a8e469cd4d721edd923aa5d8e501f545c8c405a",
+      "size": 22089,
+      "source": "boards/mchck/mchck-B_SilkS.pho",
+      "staged": "boards__mchck__mchck-B_SilkS__pho.pho"
+    },
+    {
+      "sha256": "284386a0aec4192ef7e3fe0737c0c2b461fe2618f06c759ab24315cfb4da8076",
+      "size": 621,
+      "source": "boards/mchck/mchck-Edge_Cuts.pho",
+      "staged": "boards__mchck__mchck-Edge_Cuts__pho.pho"
+    },
+    {
+      "sha256": "f87eae90681cd4ec8f93d021874503e4464bfa1c293055a2078152ed3ef17987",
+      "size": 130785,
+      "source": "boards/mchck/mchck-F_Cu.pho",
+      "staged": "boards__mchck__mchck-F_Cu__pho.pho"
+    },
+    {
+      "sha256": "4a04c1b7e2587bed72f7c47cc624952c7eac79011be793805f4f3c2d2a68cdc4",
+      "size": 37291,
+      "source": "boards/mchck/mchck-F_Mask.pho",
+      "staged": "boards__mchck__mchck-F_Mask__pho.pho"
+    },
+    {
+      "sha256": "967ad13c17ed9819d9f3176c53bfe7d992212fbec88b83bc9ded493707742b6b",
+      "size": 28504,
+      "source": "boards/mchck/mchck-F_SilkS.pho",
+      "staged": "boards__mchck__mchck-F_SilkS__pho.pho"
+    },
+    {
+      "sha256": "61879d6eadd01ffddf88ec09aaff236b2870f8d21a446dc0382656695baba1cd",
+      "size": 21079,
+      "source": "boards/usbvil/pic18f14k50.gbl",
+      "staged": "boards__usbvil__pic18f14k50__gbl.gbl"
+    },
+    {
+      "sha256": "7ac7365a00a78aeaf5bf7221f26ac354ed5af25edbe8f43b142ffd7ece39aa91",
+      "size": 3166,
+      "source": "boards/usbvil/pic18f14k50.gbo",
+      "staged": "boards__usbvil__pic18f14k50__gbo.gbo"
+    },
+    {
+      "sha256": "7ed39ae5e52d9cd01883a4f98cfe630083e783108d9aef5cf6d0e46f4c49e3b2",
+      "size": 2363,
+      "source": "boards/usbvil/pic18f14k50.gbs",
+      "staged": "boards__usbvil__pic18f14k50__gbs.gbs"
+    },
+    {
+      "sha256": "191403cfc4fd321f50f68165ba46aa24be4a358ae4294f30f95159d2d2e912c7",
+      "size": 2230,
+      "source": "boards/usbvil/pic18f14k50.gko",
+      "staged": "boards__usbvil__pic18f14k50__gko.gko"
+    },
+    {
+      "sha256": "b50cef8a2b5b39180bbde7b98fa9f3a116a9dcf8efbc9202cb3d52d042dd0b3b",
+      "size": 6496,
+      "source": "boards/usbvil/pic18f14k50.gtl",
+      "staged": "boards__usbvil__pic18f14k50__gtl.gtl"
+    },
+    {
+      "sha256": "46844a008b078945106c1bdb390acdcaa647947fd679a1ed784dfe8949e2be56",
+      "size": 5855,
+      "source": "boards/usbvil/pic18f14k50.gto",
+      "staged": "boards__usbvil__pic18f14k50__gto.gto"
+    },
+    {
+      "sha256": "4d818c27a6145799818aa033f47ceca2abf627132a1c9bfb3de72e3eadb3445f",
+      "size": 2730,
+      "source": "boards/usbvil/pic18f14k50.gts",
+      "staged": "boards__usbvil__pic18f14k50__gts.gts"
+    },
+    {
+      "sha256": "34448888197796fcdb26cbb9afd08d6846188c3df27c231d3a86c9ab504ba898",
+      "size": 106,
+      "source": "gerbers/arc-strokes/full-circle.gbr",
+      "staged": "gerbers__arc-strokes__full-circle__gbr.gbr"
+    },
+    {
+      "sha256": "55797d713920f3eb920f75353f4a0bff8296b492fb82a1270cf5139760c5cfab",
+      "size": 147,
+      "source": "gerbers/arc-strokes/multi-quadrant-I-to-II.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-I-to-II__gbr.gbr"
+    },
+    {
+      "sha256": "3057a0c007241c82cd70ec065778248260fc9d1ee810f1f8c23755d5c72a95a0",
+      "size": 148,
+      "source": "gerbers/arc-strokes/multi-quadrant-I-to-III.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-I-to-III__gbr.gbr"
+    },
+    {
+      "sha256": "0038eeb36a15593b3f0e4c2237ecdaeb0dd789b01093d50c29ca68f8a93452a6",
+      "size": 149,
+      "source": "gerbers/arc-strokes/multi-quadrant-I-to-IV.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-I-to-IV__gbr.gbr"
+    },
+    {
+      "sha256": "3f54280b48c5b7370ba645b750aa437d632bb1fe139ee2258cb635df1cde8e55",
+      "size": 147,
+      "source": "gerbers/arc-strokes/multi-quadrant-II-to-I.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-II-to-I__gbr.gbr"
+    },
+    {
+      "sha256": "bc3dbf4ab400bbd8d05090e2126ab7f4cc13dc04cf5df9724e31a3b5f640f9fb",
+      "size": 147,
+      "source": "gerbers/arc-strokes/multi-quadrant-II-to-III.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-II-to-III__gbr.gbr"
+    },
+    {
+      "sha256": "3ae9313049c17e4386bbecdf93bdd1d9e367db129309138cbe21a5b7d635669c",
+      "size": 148,
+      "source": "gerbers/arc-strokes/multi-quadrant-II-to-IV.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-II-to-IV__gbr.gbr"
+    },
+    {
+      "sha256": "210c720db0e6597cd1ca4dc4c97921c60ab7e80c186288138e07ab6da8b34ad9",
+      "size": 148,
+      "source": "gerbers/arc-strokes/multi-quadrant-III-to-I.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-III-to-I__gbr.gbr"
+    },
+    {
+      "sha256": "fffe9ec7ded3e67372f1af196a282984677844eed68f470ea4444807d8efbf73",
+      "size": 147,
+      "source": "gerbers/arc-strokes/multi-quadrant-III-to-II.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-III-to-II__gbr.gbr"
+    },
+    {
+      "sha256": "e5a3d6d5248c2adab2482a7249397508b752382665d202f1a384622625772c7f",
+      "size": 149,
+      "source": "gerbers/arc-strokes/multi-quadrant-III-to-IV.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-III-to-IV__gbr.gbr"
+    },
+    {
+      "sha256": "08c74a0bd67a9a4ea40dcc8952fc2e1a98f5b9787dc103655d1549e53efecaba",
+      "size": 149,
+      "source": "gerbers/arc-strokes/multi-quadrant-IV-to-I.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-IV-to-I__gbr.gbr"
+    },
+    {
+      "sha256": "806bb6f70e09ad8af7dd046b2808c12a8dbbfa2807d1905156128baeea54d83e",
+      "size": 148,
+      "source": "gerbers/arc-strokes/multi-quadrant-IV-to-II.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-IV-to-II__gbr.gbr"
+    },
+    {
+      "sha256": "66d54de025c4766cfa1326d16abe8fcb38d28a654045a82689ddd42259a3b150",
+      "size": 149,
+      "source": "gerbers/arc-strokes/multi-quadrant-IV-to-III.gbr",
+      "staged": "gerbers__arc-strokes__multi-quadrant-IV-to-III__gbr.gbr"
+    },
+    {
+      "sha256": "a5fe4f4df890c799bd7249a844d08a960091c7a64a61824b3a01df40876736d6",
+      "size": 138,
+      "source": "gerbers/arc-strokes/single-quadrant-I-to-II.gbr",
+      "staged": "gerbers__arc-strokes__single-quadrant-I-to-II__gbr.gbr"
+    },
+    {
+      "sha256": "e9cb5f8f4fefb03616c87105f87768fbe5e5b2bbe3f12d7ac3f541830ded24af",
+      "size": 140,
+      "source": "gerbers/arc-strokes/single-quadrant-II-to-III.gbr",
+      "staged": "gerbers__arc-strokes__single-quadrant-II-to-III__gbr.gbr"
+    },
+    {
+      "sha256": "554191f4b82f46e788c67bfa55cda8d4900b83b4393ea9a8c4f604012b15d655",
+      "size": 138,
+      "source": "gerbers/arc-strokes/single-quadrant-III-to-IV.gbr",
+      "staged": "gerbers__arc-strokes__single-quadrant-III-to-IV__gbr.gbr"
+    },
+    {
+      "sha256": "b17d7717143f6859388c68e42b9074f66b6060752120fe486977a5d95ea43512",
+      "size": 138,
+      "source": "gerbers/arc-strokes/single-quadrant-IV-to-I.gbr",
+      "staged": "gerbers__arc-strokes__single-quadrant-IV-to-I__gbr.gbr"
+    },
+    {
+      "sha256": "287faaf9e79ac21919b15ebe5593d532f9460428e1581ebef73f16c4b5710706",
+      "size": 71,
+      "source": "gerbers/arc-strokes/zero-length.gbr",
+      "staged": "gerbers__arc-strokes__zero-length__gbr.gbr"
+    },
+    {
+      "sha256": "e349162904d6833e90c4ef83d411918647eb28fb9f2df4a3b00a2a6ca16e8379",
+      "size": 87,
+      "source": "gerbers/macro-primitives/center-rect-primitive.gbr",
+      "staged": "gerbers__macro-primitives__center-rect-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "6fb79e83609ed2a995bde9d405225611f15e86b11ad9bf3ec29cc95c5ad94450",
+      "size": 81,
+      "source": "gerbers/macro-primitives/circle-primitive.gbr",
+      "staged": "gerbers__macro-primitives__circle-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "866ec5118e6a4daa50a4e03e852886cd4c7fc5045d4448769eea16b0d06600b4",
+      "size": 89,
+      "source": "gerbers/macro-primitives/lower-left-rect-primitive.gbr",
+      "staged": "gerbers__macro-primitives__lower-left-rect-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "759891d048f220c875de15ac8c67c2e1edb0b0029cbec7c92cf8a5bc4c9bb584",
+      "size": 180,
+      "source": "gerbers/macro-primitives/moire-primitive.gbr",
+      "staged": "gerbers__macro-primitives__moire-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "9b3355c03ea9339908b43a28b7b1b7c456f7e0e880d9bf0edb72a7c7b423b803",
+      "size": 101,
+      "source": "gerbers/macro-primitives/outline-primitive.gbr",
+      "staged": "gerbers__macro-primitives__outline-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "7a6a5c864825acfd521cc69f8fe4ec2b6922cfc9874bc533577c7a0ef5344492",
+      "size": 87,
+      "source": "gerbers/macro-primitives/polygon-primitive.gbr",
+      "staged": "gerbers__macro-primitives__polygon-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "84dce81720aee79a69db15106d8399800d439847409032d33ac59cda9a7f28a7",
+      "size": 88,
+      "source": "gerbers/macro-primitives/rotated-center-rect-primitive.gbr",
+      "staged": "gerbers__macro-primitives__rotated-center-rect-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "ce44f13847aaab1af19f15f615cdf10dbd67be553d190df84547783114296654",
+      "size": 91,
+      "source": "gerbers/macro-primitives/rotated-lower-left-rect-primitive.gbr",
+      "staged": "gerbers__macro-primitives__rotated-lower-left-rect-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "9446a2308d8f9f3ef3e070cccfbff32b5587ea12b168858fe90b9807f3c2cf3b",
+      "size": 182,
+      "source": "gerbers/macro-primitives/rotated-moire-primitive.gbr",
+      "staged": "gerbers__macro-primitives__rotated-moire-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "1ff072ccb34d1069770c7653cd3b5437c9d02766bbe8a30fd5b97a79ea20376f",
+      "size": 103,
+      "source": "gerbers/macro-primitives/rotated-outline-primitive.gbr",
+      "staged": "gerbers__macro-primitives__rotated-outline-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "1c5e3f3b3bf9c1968eb4e3e0c465115dba118e6f142d68345d8fa2d14b1b007e",
+      "size": 88,
+      "source": "gerbers/macro-primitives/rotated-polygon-primitive.gbr",
+      "staged": "gerbers__macro-primitives__rotated-polygon-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "5cd202d5947b4d40565c58aba2fa5e030fb6b86208fafaf2162aafe0b6ad4466",
+      "size": 93,
+      "source": "gerbers/macro-primitives/rotated-thermal-primitive.gbr",
+      "staged": "gerbers__macro-primitives__rotated-thermal-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "6a77e1cf5fb0f44af35f89bd5ee8f9edb29b87f6cae21518d87e419b1f8e0fcf",
+      "size": 92,
+      "source": "gerbers/macro-primitives/rotated-vector-primitive.gbr",
+      "staged": "gerbers__macro-primitives__rotated-vector-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "e1d048ec194b6744a7bd912ce7db8f5b76f9d34597219bb8bd2ebb8d59dc5e94",
+      "size": 91,
+      "source": "gerbers/macro-primitives/thermal-primitive.gbr",
+      "staged": "gerbers__macro-primitives__thermal-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "78b496bf363fef7a0fda876813380331b423c40346e0a0aa9b063a9c5fe8df1e",
+      "size": 90,
+      "source": "gerbers/macro-primitives/vector-primitive.gbr",
+      "staged": "gerbers__macro-primitives__vector-primitive__gbr.gbr"
+    },
+    {
+      "sha256": "7bf2845c89e8e08d7e9d92839827786e91b9158ba69f2eada133b780bbeb36fa",
+      "size": 150,
+      "source": "gerbers/macros/clear-with-moire.gbr",
+      "staged": "gerbers__macros__clear-with-moire__gbr.gbr"
+    },
+    {
+      "sha256": "b78e6bde6c4fc3bcf4f67e5f9ce7e28ceaabb7bab34a51af06403189e3b00c55",
+      "size": 235,
+      "source": "gerbers/macros/clear-with-multiple-exposures.gbr",
+      "staged": "gerbers__macros__clear-with-multiple-exposures__gbr.gbr"
+    },
+    {
+      "sha256": "ccf73e2898fb68982c7a0e7119825af0b86dddfa22958eabccf6d0e7197464b3",
+      "size": 137,
+      "source": "gerbers/macros/clear-with-thermal.gbr",
+      "staged": "gerbers__macros__clear-with-thermal__gbr.gbr"
+    },
+    {
+      "sha256": "4246bb6e6b9132bd7a193f59d70ef7adbf195667994b8a27d24c707a04c473d4",
+      "size": 428,
+      "source": "gerbers/macros/multiple-exposures.gbr",
+      "staged": "gerbers__macros__multiple-exposures__gbr.gbr"
+    },
+    {
+      "sha256": "ce19b289833d7854efe215aeca0d296a2e871d0bbbb050b5a5834d76c9b14cd6",
+      "size": 60,
+      "source": "gerbers/pads/circle-with-hole.gbr",
+      "staged": "gerbers__pads__circle-with-hole__gbr.gbr"
+    },
+    {
+      "sha256": "edf82f3003c7ca7261673df810bc23878a901476046aa30a9d6cb5b423398ea5",
+      "size": 65,
+      "source": "gerbers/pads/circle-with-rect-hole.gbr",
+      "staged": "gerbers__pads__circle-with-rect-hole__gbr.gbr"
+    },
+    {
+      "sha256": "94d3f2f63ff34647dcfc2e13ae5d5407031f324aa825aa38dcb69058c26c903a",
+      "size": 55,
+      "source": "gerbers/pads/circle.gbr",
+      "staged": "gerbers__pads__circle__gbr.gbr"
+    },
+    {
+      "sha256": "5ecb792400f3d62a61b00d05faed4c840aedf9e44e38e69c066492a61320c4dd",
+      "size": 64,
+      "source": "gerbers/pads/obround-with-hole.gbr",
+      "staged": "gerbers__pads__obround-with-hole__gbr.gbr"
+    },
+    {
+      "sha256": "324e33c815ddbcb0e672c0b3e3889275edb2b727d1d73fd3bd30da47e0271b09",
+      "size": 69,
+      "source": "gerbers/pads/obround-with-rect-hole.gbr",
+      "staged": "gerbers__pads__obround-with-rect-hole__gbr.gbr"
+    },
+    {
+      "sha256": "24b79c8de8a9809825407b2673c9a570364d13ede7c3c3fb25eacb5b44f62140",
+      "size": 59,
+      "source": "gerbers/pads/obround.gbr",
+      "staged": "gerbers__pads__obround__gbr.gbr"
+    },
+    {
+      "sha256": "fb8ea94a56dbf76096cd6251913a679b8d7bf9d6a6622deb8d6d9183d949151f",
+      "size": 60,
+      "source": "gerbers/pads/polygon-rotated.gbr",
+      "staged": "gerbers__pads__polygon-rotated__gbr.gbr"
+    },
+    {
+      "sha256": "cecaaefd56fdb50087542683e75c39bc6e446033d5e6f5e5ae9e27c1b7ff10d6",
+      "size": 64,
+      "source": "gerbers/pads/polygon-with-hole.gbr",
+      "staged": "gerbers__pads__polygon-with-hole__gbr.gbr"
+    },
+    {
+      "sha256": "1f827ae30b54a0e8091a9653ec0bce0a48529167501b4fc28fead6f7c383b594",
+      "size": 69,
+      "source": "gerbers/pads/polygon-with-rect-hole.gbr",
+      "staged": "gerbers__pads__polygon-with-rect-hole__gbr.gbr"
+    },
+    {
+      "sha256": "7a77d033c719844a836992d5da8774b285c2e5d3e368553b5e40e2748fa39e1a",
+      "size": 365,
+      "source": "gerbers/pads/polygon.gbr",
+      "staged": "gerbers__pads__polygon__gbr.gbr"
+    },
+    {
+      "sha256": "1df38d6dda5ab17f0597aa269a1946018aa5a946934c72af223867daddf6d102",
+      "size": 64,
+      "source": "gerbers/pads/rectangle-with-hole.gbr",
+      "staged": "gerbers__pads__rectangle-with-hole__gbr.gbr"
+    },
+    {
+      "sha256": "cabba0bf05d526c948ccbb9bf179c09833d1cccd654a66d251fba8aab6fb1930",
+      "size": 69,
+      "source": "gerbers/pads/rectangle-with-rect-hole.gbr",
+      "staged": "gerbers__pads__rectangle-with-rect-hole__gbr.gbr"
+    },
+    {
+      "sha256": "d46527af21f9ee53d5634381338f81833c400ce5ff02fe825e6894b31202fbcf",
+      "size": 59,
+      "source": "gerbers/pads/rectangle.gbr",
+      "staged": "gerbers__pads__rectangle__gbr.gbr"
+    },
+    {
+      "sha256": "9a79cc0bcfdb791983f4ec022d249cc4d9d9843607a910b0379eb555d071b679",
+      "size": 187,
+      "source": "gerbers/regions/region-with-arc-cut-in.gbr",
+      "staged": "gerbers__regions__region-with-arc-cut-in__gbr.gbr"
+    },
+    {
+      "sha256": "39c7777e7598aaa85a46308895113be4b68b8e1e87ee87d583c4392225181b10",
+      "size": 185,
+      "source": "gerbers/regions/region-with-arcs.gbr",
+      "staged": "gerbers__regions__region-with-arcs__gbr.gbr"
+    },
+    {
+      "sha256": "176db0f0c088afbdb6feb7444abc3f9c16958e9e98327e6bbf40bfc2e28e8f88",
+      "size": 315,
+      "source": "gerbers/regions/region-with-cut-in-line.gbr",
+      "staged": "gerbers__regions__region-with-cut-in-line__gbr.gbr"
+    },
+    {
+      "sha256": "093bcf36d2180adad1f3982e0ea4605983d0a5f7eec6c1a09930e52c03ae2b22",
+      "size": 176,
+      "source": "gerbers/regions/region-with-lines.gbr",
+      "staged": "gerbers__regions__region-with-lines__gbr.gbr"
+    },
+    {
+      "sha256": "558d3f66d482a869b0c1afd6686e08333e77de169bfee611a6e599e068a35519",
+      "size": 200,
+      "source": "gerbers/step-repeats/multi-polarity-over-existing.gbr",
+      "staged": "gerbers__step-repeats__multi-polarity-over-existing__gbr.gbr"
+    },
+    {
+      "sha256": "a8349e08a5d921aef3000c11ed6ce9186f9e8cec5dfecd3af7e74e5b7ef8a95d",
+      "size": 191,
+      "source": "gerbers/step-repeats/multi-polarity-over-self.gbr",
+      "staged": "gerbers__step-repeats__multi-polarity-over-self__gbr.gbr"
+    },
+    {
+      "sha256": "150ad7c340393c59e798ea701d934aae9c89184f787da43a17877372d65fb205",
+      "size": 145,
+      "source": "gerbers/step-repeats/multi-polarity.gbr",
+      "staged": "gerbers__step-repeats__multi-polarity__gbr.gbr"
+    },
+    {
+      "sha256": "9a0f58f2841fcd41e0c8c0bcb97487e46cf0c9030242d7300a0e1ac46eaa6f81",
+      "size": 73,
+      "source": "gerbers/step-repeats/one-polarity.gbr",
+      "staged": "gerbers__step-repeats__one-polarity__gbr.gbr"
+    },
+    {
+      "sha256": "ae1002e87ef4dcbdc3903425d904688353497bc5bd6c41aad3f4e1378916ed97",
+      "size": 127,
+      "source": "gerbers/strokes/circle-tool-multi-segment.gbr",
+      "staged": "gerbers__strokes__circle-tool-multi-segment__gbr.gbr"
+    },
+    {
+      "sha256": "6cd9f4cce1ca079b8fbade42c7b2940dd38fb79bb4de0f0f39ef9951ef70c0b1",
+      "size": 66,
+      "source": "gerbers/strokes/circle-tool-single-segment.gbr",
+      "staged": "gerbers__strokes__circle-tool-single-segment__gbr.gbr"
+    },
+    {
+      "sha256": "d827796c6ba600d0314fc0e81ac51c666bd9f18fe0a11bda547fd43c43c97ab5",
+      "size": 60,
+      "source": "gerbers/strokes/circle-tool-zero-length.gbr",
+      "staged": "gerbers__strokes__circle-tool-zero-length__gbr.gbr"
+    },
+    {
+      "sha256": "1c8d8e54a1a2c66cbfadecff500e9ec796b220a9f84505b60cec31cc6e9343cd",
+      "size": 131,
+      "source": "gerbers/strokes/rect-tool-multi-segment.gbr",
+      "staged": "gerbers__strokes__rect-tool-multi-segment__gbr.gbr"
+    },
+    {
+      "sha256": "ef12bfe9af840dbef4e0485e3869e1f80d0ec731d52a82735ed1aa061b1a1dfd",
+      "size": 70,
+      "source": "gerbers/strokes/rect-tool-single-segment.gbr",
+      "staged": "gerbers__strokes__rect-tool-single-segment__gbr.gbr"
+    },
+    {
+      "sha256": "fe44296f41d92b31974d7bcd8595b01cdd6e5cdf8c80ba66d517770b9bf78791",
+      "size": 65,
+      "source": "gerbers/strokes/rect-tool-zero-length.gbr",
+      "staged": "gerbers__strokes__rect-tool-zero-length__gbr.gbr"
+    }
+  ],
+  "repository": "https://github.com/tracespace/tracespace"
+}

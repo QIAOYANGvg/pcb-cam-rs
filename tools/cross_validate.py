@@ -27,21 +27,93 @@ from typing import Any
 GERBER_EXTS = {
     ".gbr", ".gtl", ".gbl", ".gts", ".gbs", ".gto", ".gbo", ".gko", ".gtp", ".gbp",
     ".gdl", ".gdd", ".gml", ".gcl", ".g1", ".g2", ".g3", ".g4", ".g5", ".g6", ".g7",
-    ".g8", ".pho", ".art",
+    ".g8", ".ger", ".pho", ".art",
 }
+
+GOLDEN_ROOT_FIELDS = {"metadata", "dcodes", "items"}
+GOLDEN_METADATA_FIELDS = {
+    "fileName",
+    "isMetric",
+    "isX2",
+    "imageNegative",
+    "fileFunction",
+    "itemCount",
+    "dcodeCount",
+    "imageOffset",
+    "imageRotation",
+    "localRotation",
+    "offset",
+    "scale",
+    "swapAxis",
+    "mirrorA",
+    "mirrorB",
+    "imageJustifyOffset",
+    "imageJustifyXCenter",
+    "imageJustifyYCenter",
+    "fmtScale",
+    "fmtLen",
+    "noTrailingZeros",
+    "relative",
+}
+GOLDEN_DCODE_REQUIRED_FIELDS = {
+    "num",
+    "type",
+    "size",
+    "drill",
+    "drillShape",
+    "rotation",
+    "edgesCount",
+    "inUse",
+    "defined",
+    "aperFunction",
+}
+GOLDEN_DCODE_OPTIONAL_FIELDS = {
+    "macroName",
+    "macroParams",
+    "polygon",
+}
+GOLDEN_ITEM_REQUIRED_FIELDS = {
+    "shapeType",
+    "start",
+    "end",
+    "size",
+    "dcode",
+    "flashed",
+    "unitsMetric",
+    "layerNegative",
+    "aperFunction",
+    "netAttributes",
+    "boundingBox",
+}
+GOLDEN_ITEM_OPTIONAL_FIELDS = {
+    "arcCentre",
+    "aperture",
+    "shapeAsPolygon",
+    "macroShapePolygon",
+}
+GOLDEN_NET_ATTRIBUTE_FIELDS = {
+    "netAttribType",
+    "netname",
+    "cmpref",
+    "padname",
+    "pinFunction",
+}
+GOLDEN_APERTURE_FIELDS = {"type", "size"}
+GOLDEN_BOUNDING_BOX_FIELDS = {"origin", "size"}
+GOLDEN_VECTOR_FIELDS = {"x", "y"}
+GOLDEN_POLYGON_FIELDS = {"outline", "holes"}
 
 RUST_RUNNER = r'''
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use gerber_parse::coord::Vec2I;
-use gerber_parse::gerber_parser::load_gerber_file;
-use gerber_parse::geometry::PolySet;
+use gerber_parse::geometry::{PolySet, Vec2I};
+use gerber_parse::readgerb::load_gerber_file;
 use gerber_parse::types::{ApertureHoleType, ApertureType, ShapeType};
 
 const GERBER_EXTS: &[&str] = &[
     "gbr", "gtl", "gbl", "gts", "gbs", "gto", "gbo", "gko", "gtp", "gbp", "gdl", "gdd",
-    "gml", "gcl", "g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "pho", "art",
+    "gml", "gcl", "g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "ger", "pho", "art",
 ];
 
 fn main() {
@@ -329,6 +401,7 @@ def parse_rust_records(output: str) -> dict[str, ParserFile]:
             record.errors.append(unesc(parts[2]))
         elif kind == "META":
             record.metadata = {
+                "fileName": "",
                 "isMetric": parse_bool(parts[2]),
                 "isX2": parse_bool(parts[3]),
                 "imageNegative": parse_bool(parts[4]),
@@ -411,6 +484,214 @@ def load_golden(golden_dir: Path) -> dict[str, dict[str, Any]]:
     for path in sorted(golden_dir.glob("*.json")):
         result[path.stem] = json.loads(path.read_text(encoding="utf-8"))
     return result
+
+
+def audit_keys(
+    path: str,
+    value: Any,
+    required: set[str],
+    optional: set[str] | None = None,
+) -> list[str]:
+    if not isinstance(value, dict):
+        return [f"{path}: expected object, found {type(value).__name__}"]
+
+    optional = optional or set()
+    actual = set(value)
+    errors = [
+        f"{path}: missing field {field_name}"
+        for field_name in sorted(required - actual)
+    ]
+    errors.extend(
+        f"{path}: unknown field {field_name}"
+        for field_name in sorted(actual - required - optional)
+    )
+    return errors
+
+
+def audit_vector(path: str, value: Any) -> list[str]:
+    return audit_keys(path, value, GOLDEN_VECTOR_FIELDS)
+
+
+def audit_polyset(path: str, value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return [f"{path}: expected array, found {type(value).__name__}"]
+
+    errors = []
+    for polygon_index, polygon in enumerate(value):
+        polygon_path = f"{path}[{polygon_index}]"
+        errors.extend(
+            audit_keys(polygon_path, polygon, GOLDEN_POLYGON_FIELDS)
+        )
+        if not isinstance(polygon, dict):
+            continue
+
+        outline = polygon.get("outline")
+        holes = polygon.get("holes")
+        if not isinstance(outline, list):
+            errors.append(f"{polygon_path}.outline: expected array")
+        else:
+            for point_index, point in enumerate(outline):
+                errors.extend(
+                    audit_vector(
+                        f"{polygon_path}.outline[{point_index}]",
+                        point,
+                    )
+                )
+
+        if not isinstance(holes, list):
+            errors.append(f"{polygon_path}.holes: expected array")
+        else:
+            for hole_index, hole in enumerate(holes):
+                hole_path = f"{polygon_path}.holes[{hole_index}]"
+                if not isinstance(hole, list):
+                    errors.append(f"{hole_path}: expected array")
+                    continue
+                for point_index, point in enumerate(hole):
+                    errors.extend(
+                        audit_vector(
+                            f"{hole_path}[{point_index}]",
+                            point,
+                        )
+                    )
+    return errors
+
+
+def audit_golden_schema(stem: str, data: Any) -> list[str]:
+    root_path = f"golden[{stem}]"
+    errors = audit_keys(root_path, data, GOLDEN_ROOT_FIELDS)
+    if not isinstance(data, dict):
+        return errors
+
+    metadata = data.get("metadata")
+    errors.extend(
+        audit_keys(
+            f"{root_path}.metadata",
+            metadata,
+            GOLDEN_METADATA_FIELDS,
+        )
+    )
+    if isinstance(metadata, dict):
+        for field_name in (
+            "imageOffset",
+            "offset",
+            "scale",
+            "imageJustifyOffset",
+            "fmtScale",
+            "fmtLen",
+        ):
+            errors.extend(
+                audit_vector(
+                    f"{root_path}.metadata.{field_name}",
+                    metadata.get(field_name),
+                )
+            )
+
+    dcodes = data.get("dcodes")
+    if not isinstance(dcodes, list):
+        errors.append(f"{root_path}.dcodes: expected array")
+    else:
+        for index, dcode in enumerate(dcodes):
+            dcode_path = f"{root_path}.dcodes[{index}]"
+            errors.extend(
+                audit_keys(
+                    dcode_path,
+                    dcode,
+                    GOLDEN_DCODE_REQUIRED_FIELDS,
+                    GOLDEN_DCODE_OPTIONAL_FIELDS,
+                )
+            )
+            if not isinstance(dcode, dict):
+                continue
+            errors.extend(audit_vector(f"{dcode_path}.size", dcode.get("size")))
+            errors.extend(audit_vector(f"{dcode_path}.drill", dcode.get("drill")))
+            if "polygon" in dcode:
+                errors.extend(
+                    audit_polyset(f"{dcode_path}.polygon", dcode["polygon"])
+                )
+
+    items = data.get("items")
+    if not isinstance(items, list):
+        errors.append(f"{root_path}.items: expected array")
+    else:
+        for index, item in enumerate(items):
+            item_path = f"{root_path}.items[{index}]"
+            errors.extend(
+                audit_keys(
+                    item_path,
+                    item,
+                    GOLDEN_ITEM_REQUIRED_FIELDS,
+                    GOLDEN_ITEM_OPTIONAL_FIELDS,
+                )
+            )
+            if not isinstance(item, dict):
+                continue
+            for field_name in ("start", "end", "size"):
+                errors.extend(
+                    audit_vector(
+                        f"{item_path}.{field_name}",
+                        item.get(field_name),
+                    )
+                )
+            if "arcCentre" in item:
+                errors.extend(
+                    audit_vector(
+                        f"{item_path}.arcCentre",
+                        item["arcCentre"],
+                    )
+                )
+            errors.extend(
+                audit_keys(
+                    f"{item_path}.netAttributes",
+                    item.get("netAttributes"),
+                    GOLDEN_NET_ATTRIBUTE_FIELDS,
+                )
+            )
+            bounding_box = item.get("boundingBox")
+            errors.extend(
+                audit_keys(
+                    f"{item_path}.boundingBox",
+                    bounding_box,
+                    GOLDEN_BOUNDING_BOX_FIELDS,
+                )
+            )
+            if isinstance(bounding_box, dict):
+                errors.extend(
+                    audit_vector(
+                        f"{item_path}.boundingBox.origin",
+                        bounding_box.get("origin"),
+                    )
+                )
+                errors.extend(
+                    audit_vector(
+                        f"{item_path}.boundingBox.size",
+                        bounding_box.get("size"),
+                    )
+                )
+            if "aperture" in item:
+                aperture = item["aperture"]
+                errors.extend(
+                    audit_keys(
+                        f"{item_path}.aperture",
+                        aperture,
+                        GOLDEN_APERTURE_FIELDS,
+                    )
+                )
+                if isinstance(aperture, dict):
+                    errors.extend(
+                        audit_vector(
+                            f"{item_path}.aperture.size",
+                            aperture.get("size"),
+                        )
+                    )
+            for field_name in ("shapeAsPolygon", "macroShapePolygon"):
+                if field_name in item:
+                    errors.extend(
+                        audit_polyset(
+                            f"{item_path}.{field_name}",
+                            item[field_name],
+                        )
+                    )
+    return errors
 
 
 def parser_files_from_json(files: dict[str, dict[str, Any]]) -> dict[str, ParserFile]:
@@ -499,25 +780,161 @@ def compare_box(path: str, rust: dict[str, Any], golden: dict[str, Any], mismatc
     compare_vec(f"{path}.size", rust.get("size", {}), golden.get("size", {}), mismatches, tolerance)
 
 
-def compare_polyset(path: str, rust: list[Any], golden: list[Any], mismatches: list[str], tolerance: int = 1) -> None:
-    compare_scalar(f"{path}.len", len(rust), len(golden), mismatches)
-    for oi, (rp, gp) in enumerate(zip(rust, golden)):
-        ro = rp.get("outline", [])
-        go = gp.get("outline", [])
-        compare_scalar(f"{path}[{oi}].outline.len", len(ro), len(go), mismatches)
-        for pi, (rpt, gpt) in enumerate(zip(ro, go)):
-            compare_vec(f"{path}[{oi}].outline[{pi}]", rpt, gpt, mismatches, tolerance)
-        rh = rp.get("holes", [])
-        gh = gp.get("holes", [])
-        compare_scalar(f"{path}[{oi}].holes.len", len(rh), len(gh), mismatches)
-        for hi, (rhole, ghole) in enumerate(zip(rh, gh)):
-            compare_scalar(f"{path}[{oi}].holes[{hi}].len", len(rhole), len(ghole), mismatches)
-            for pi, (rpt, gpt) in enumerate(zip(rhole, ghole)):
-                compare_vec(f"{path}[{oi}].holes[{hi}][{pi}]", rpt, gpt, mismatches, tolerance)
+def is_redundant_collinear(
+    previous: tuple[int, int],
+    current: tuple[int, int],
+    following: tuple[int, int],
+) -> bool:
+    ax = current[0] - previous[0]
+    ay = current[1] - previous[1]
+    bx = following[0] - current[0]
+    by = following[1] - current[1]
+    return ax * by - ay * bx == 0 and ax * bx + ay * by >= 0
 
 
-def compare_file(stem: str, actual: ParserFile, expected: dict[str, Any], max_mismatches: int) -> list[str]:
+def normalize_ring(
+    points: list[dict[str, Any]],
+    remove_redundant_collinear: bool = True,
+) -> tuple[tuple[int, int], ...]:
+    ring: list[tuple[int, int]] = []
+    for point in points:
+        value = (int(point["x"]), int(point["y"]))
+        if not ring or ring[-1] != value:
+            ring.append(value)
+
+    while len(ring) > 1 and ring[0] == ring[-1]:
+        ring.pop()
+
+    if remove_redundant_collinear:
+        while len(ring) >= 3:
+            filtered = [
+                point
+                for index, point in enumerate(ring)
+                if not is_redundant_collinear(
+                    ring[(index - 1) % len(ring)],
+                    point,
+                    ring[(index + 1) % len(ring)],
+                )
+            ]
+            if len(filtered) == len(ring):
+                break
+            ring = filtered
+
+    if not ring:
+        return ()
+
+    def minimum_rotation(values: list[tuple[int, int]]) -> tuple[tuple[int, int], ...]:
+        minimum = min(values)
+        candidates = [
+            tuple(values[index:] + values[:index])
+            for index, value in enumerate(values)
+            if value == minimum
+        ]
+        return min(candidates)
+
+    forward = minimum_rotation(ring)
+    reverse = minimum_rotation(list(reversed(ring)))
+    return min(forward, reverse)
+
+
+def normalize_polyset(
+    polygons: list[Any],
+    remove_redundant_collinear: bool = True,
+) -> list[tuple[tuple[tuple[int, int], ...], tuple[tuple[tuple[int, int], ...], ...]]]:
+    normalized = []
+    for polygon in polygons:
+        outline = normalize_ring(
+            polygon.get("outline", []),
+            remove_redundant_collinear,
+        )
+        holes = tuple(
+            sorted(
+                normalize_ring(hole, remove_redundant_collinear)
+                for hole in polygon.get("holes", [])
+            )
+        )
+        normalized.append((outline, holes))
+    normalized.sort()
+    return normalized
+
+
+def compare_polyset(
+    path: str,
+    rust: list[Any],
+    golden: list[Any],
+    mismatches: list[str],
+    tolerance: int = 1,
+    remove_redundant_collinear: bool = True,
+) -> None:
+    rust_normalized = normalize_polyset(rust, remove_redundant_collinear)
+    golden_normalized = normalize_polyset(golden, remove_redundant_collinear)
+    compare_scalar(
+        f"{path}.len",
+        len(rust_normalized),
+        len(golden_normalized),
+        mismatches,
+    )
+    for oi, (actual_polygon, expected_polygon) in enumerate(
+        zip(rust_normalized, golden_normalized)
+    ):
+        actual_outline, actual_holes = actual_polygon
+        expected_outline, expected_holes = expected_polygon
+        compare_scalar(
+            f"{path}[{oi}].outline.len",
+            len(actual_outline),
+            len(expected_outline),
+            mismatches,
+        )
+        for pi, (actual_point, expected_point) in enumerate(
+            zip(actual_outline, expected_outline)
+        ):
+            compare_vec(
+                f"{path}[{oi}].outline[{pi}]",
+                {"x": actual_point[0], "y": actual_point[1]},
+                {"x": expected_point[0], "y": expected_point[1]},
+                mismatches,
+                tolerance,
+            )
+        compare_scalar(
+            f"{path}[{oi}].holes.len",
+            len(actual_holes),
+            len(expected_holes),
+            mismatches,
+        )
+        for hi, (actual_hole, expected_hole) in enumerate(
+            zip(actual_holes, expected_holes)
+        ):
+            compare_scalar(
+                f"{path}[{oi}].holes[{hi}].len",
+                len(actual_hole),
+                len(expected_hole),
+                mismatches,
+            )
+            for pi, (actual_point, expected_point) in enumerate(
+                zip(actual_hole, expected_hole)
+            ):
+                compare_vec(
+                    f"{path}[{oi}].holes[{hi}][{pi}]",
+                    {"x": actual_point[0], "y": actual_point[1]},
+                    {"x": expected_point[0], "y": expected_point[1]},
+                    mismatches,
+                    tolerance,
+                )
+
+
+def compare_file(
+    stem: str,
+    actual: ParserFile,
+    expected: dict[str, Any],
+    max_mismatches: int,
+    strict: bool = False,
+) -> list[str]:
     mismatches: list[str] = []
+    scalar_tolerance = 0.0 if strict else 0.000001
+    coordinate_tolerance = 0 if strict else 1
+    bounding_box_tolerance = 0 if strict else 100
+    rotation_tolerance = 0.0 if strict else 0.01
+    macro_param_tolerance = 0.0 if strict else 0.001
 
     if actual.errors:
         mismatches.extend(f"parse error: {err}" for err in actual.errors)
@@ -530,14 +947,26 @@ def compare_file(stem: str, actual: ParserFile, expected: dict[str, Any], max_mi
     rm = actual.metadata
 
     for field_name in [
-        "isMetric", "isX2", "imageNegative", "fileFunction", "itemCount", "dcodeCount", "imageRotation",
+        "fileName", "isMetric", "isX2", "imageNegative", "fileFunction", "itemCount", "dcodeCount", "imageRotation",
         "localRotation", "swapAxis", "mirrorA", "mirrorB", "imageJustifyXCenter", "imageJustifyYCenter",
         "noTrailingZeros", "relative",
     ]:
-        compare_scalar(f"metadata.{field_name}", rm[field_name], gm.get(field_name), mismatches, 0.000001)
+        compare_scalar(
+            f"metadata.{field_name}",
+            rm[field_name],
+            gm.get(field_name),
+            mismatches,
+            scalar_tolerance,
+        )
 
     for field_name in ["imageOffset", "offset", "scale", "imageJustifyOffset", "fmtScale", "fmtLen"]:
-        compare_vec(f"metadata.{field_name}", rm[field_name], gm.get(field_name, {}), mismatches)
+        compare_vec(
+            f"metadata.{field_name}",
+            rm[field_name],
+            gm.get(field_name, {}),
+            mismatches,
+            coordinate_tolerance,
+        )
 
     golden_dcodes = {int(d["num"]): d for d in expected.get("dcodes", [])}
     compare_scalar("dcodes.keys", sorted(actual.dcodes.keys()), sorted(golden_dcodes.keys()), mismatches)
@@ -550,9 +979,27 @@ def compare_file(stem: str, actual: ParserFile, expected: dict[str, Any], max_mi
 
         for field_name in ["num", "type", "drillShape", "edgesCount", "inUse", "defined", "aperFunction"]:
             compare_scalar(f"dcodes[{num}].{field_name}", rd[field_name], gd.get(field_name), mismatches)
-        compare_scalar(f"dcodes[{num}].rotation", rd["rotation"], gd.get("rotation", 0), mismatches, 0.01)
-        compare_vec(f"dcodes[{num}].size", rd["size"], gd.get("size", {}), mismatches, 1)
-        compare_vec(f"dcodes[{num}].drill", rd["drill"], gd.get("drill", {}), mismatches, 1)
+        compare_scalar(
+            f"dcodes[{num}].rotation",
+            rd["rotation"],
+            gd.get("rotation", 0),
+            mismatches,
+            rotation_tolerance,
+        )
+        compare_vec(
+            f"dcodes[{num}].size",
+            rd["size"],
+            gd.get("size", {}),
+            mismatches,
+            coordinate_tolerance,
+        )
+        compare_vec(
+            f"dcodes[{num}].drill",
+            rd["drill"],
+            gd.get("drill", {}),
+            mismatches,
+            coordinate_tolerance,
+        )
         if "macroName" in gd:
             compare_scalar(f"dcodes[{num}].macroName", rd.get("macroName"), gd.get("macroName"), mismatches)
         if "macroParams" in gd:
@@ -565,10 +1012,17 @@ def compare_file(stem: str, actual: ParserFile, expected: dict[str, Any], max_mi
                     actual_param,
                     expected_param,
                     mismatches,
-                    0.001,
+                    macro_param_tolerance,
                 )
         if "polygon" in gd:
-            compare_polyset(f"dcodes[{num}].polygon", rd.get("polygon", []), gd.get("polygon", []), mismatches, 1)
+            compare_polyset(
+                f"dcodes[{num}].polygon",
+                rd.get("polygon", []),
+                gd.get("polygon", []),
+                mismatches,
+                coordinate_tolerance,
+                not strict,
+            )
 
     golden_items = expected.get("items", [])
     compare_scalar("items.len", len(actual.items), len(golden_items), mismatches)
@@ -580,23 +1034,73 @@ def compare_file(stem: str, actual: ParserFile, expected: dict[str, Any], max_mi
         ri = actual.items[idx]
         for field_name in ["shapeType", "dcode", "flashed", "unitsMetric", "layerNegative", "aperFunction"]:
             compare_scalar(f"items[{idx}].{field_name}", ri[field_name], gi.get(field_name), mismatches)
-        compare_vec(f"items[{idx}].start", ri["start"], gi.get("start", {}), mismatches, 1)
-        compare_vec(f"items[{idx}].end", ri["end"], gi.get("end", {}), mismatches, 1)
-        compare_vec(f"items[{idx}].size", ri["size"], gi.get("size", {}), mismatches, 1)
+        compare_vec(
+            f"items[{idx}].start",
+            ri["start"],
+            gi.get("start", {}),
+            mismatches,
+            coordinate_tolerance,
+        )
+        compare_vec(
+            f"items[{idx}].end",
+            ri["end"],
+            gi.get("end", {}),
+            mismatches,
+            coordinate_tolerance,
+        )
+        compare_vec(
+            f"items[{idx}].size",
+            ri["size"],
+            gi.get("size", {}),
+            mismatches,
+            coordinate_tolerance,
+        )
         if "arcCentre" in gi:
-            compare_vec(f"items[{idx}].arcCentre", ri.get("arcCentre", {}), gi.get("arcCentre", {}), mismatches, 1)
+            compare_vec(
+                f"items[{idx}].arcCentre",
+                ri.get("arcCentre", {}),
+                gi.get("arcCentre", {}),
+                mismatches,
+                coordinate_tolerance,
+            )
         compare_net_attrs(f"items[{idx}].netAttributes", ri["netAttributes"], gi.get("netAttributes", {}), mismatches)
         if "boundingBox" in gi:
-            compare_box(f"items[{idx}].boundingBox", ri.get("boundingBox", {}), gi.get("boundingBox", {}), mismatches, 100)
+            compare_box(
+                f"items[{idx}].boundingBox",
+                ri.get("boundingBox", {}),
+                gi.get("boundingBox", {}),
+                mismatches,
+                bounding_box_tolerance,
+            )
         if "shapeAsPolygon" in gi:
-            compare_polyset(f"items[{idx}].shapeAsPolygon", ri.get("shapeAsPolygon", []), gi.get("shapeAsPolygon", []), mismatches, 1)
+            compare_polyset(
+                f"items[{idx}].shapeAsPolygon",
+                ri.get("shapeAsPolygon", []),
+                gi.get("shapeAsPolygon", []),
+                mismatches,
+                coordinate_tolerance,
+                not strict,
+            )
         if "macroShapePolygon" in gi:
-            compare_polyset(f"items[{idx}].macroShapePolygon", ri.get("macroShapePolygon", []), gi.get("macroShapePolygon", []), mismatches, 1)
+            compare_polyset(
+                f"items[{idx}].macroShapePolygon",
+                ri.get("macroShapePolygon", []),
+                gi.get("macroShapePolygon", []),
+                mismatches,
+                coordinate_tolerance,
+                not strict,
+            )
 
         if "aperture" in gi and ri["dcode"] in actual.dcodes:
             rd = actual.dcodes[ri["dcode"]]
             compare_scalar(f"items[{idx}].aperture.type", rd["type"], gi["aperture"].get("type"), mismatches)
-            compare_vec(f"items[{idx}].aperture.size", rd["size"], gi["aperture"].get("size", {}), mismatches, 1)
+            compare_vec(
+                f"items[{idx}].aperture.size",
+                rd["size"],
+                gi["aperture"].get("size", {}),
+                mismatches,
+                coordinate_tolerance,
+            )
 
         if len(mismatches) >= max_mismatches:
             mismatches.append(f"stopped after {max_mismatches} mismatches")
@@ -630,6 +1134,7 @@ def main() -> int:
     )
     parser.add_argument("--web-output-dir", type=Path, help="Optional directory to retain generated Web JSON files")
     parser.add_argument("--max-mismatches", type=int, default=20, help="Maximum mismatches to print per file")
+    parser.add_argument("--strict", action="store_true", help="Require exact field and polygon vertex equality")
     parser.add_argument("--keep-runner", action="store_true", help="Keep temporary Rust runner for debugging")
     parser.add_argument("--keep-web-output", action="store_true", help="Keep temporary Web JSON output for debugging")
     args = parser.parse_args()
@@ -672,7 +1177,13 @@ def main() -> int:
             comparisons.append(("rust-vs-web", ParserFile(errors=["missing Web output"]), golden[stem]))
 
         for label, actual, expected in comparisons:
-            file_mismatches = compare_file(stem, actual, expected, args.max_mismatches)
+            file_mismatches = compare_file(
+                stem,
+                actual,
+                expected,
+                args.max_mismatches,
+                args.strict,
+            )
             if file_mismatches:
                 stats[label]["mismatched"] += 1
                 print(f"FAIL [{label}] {stem}: {len(file_mismatches)} mismatch(es)")

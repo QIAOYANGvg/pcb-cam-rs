@@ -64,7 +64,6 @@ fn overlapping_subject_contours_match_clipper2_fixture() {
 }
 
 #[test]
-#[ignore = "i_overlay preserves one extra redundant collinear vertex"]
 fn overlapping_subject_contours_have_identical_strict_vertices() {
     let subject =
         PolySet::from_outlines(&[rect(0, 0, 10, 10), rect(5, 0, 15, 10), rect(7, -5, 12, 15)]);
@@ -153,7 +152,7 @@ fn assert_matches_clipper2_fixture(
     assert_eq!(
         canonical_polyset(&actual),
         canonical_polyset(&expected),
-        "i_overlay result:\n{actual:#?}\nHistorical Clipper2 fixture:\n{expected:#?}"
+        "Clipper2 result:\n{actual:#?}\nExpected fixture:\n{expected:#?}"
     );
 }
 

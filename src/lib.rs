@@ -1,6 +1,7 @@
 pub mod am_param;
 pub mod am_primitive;
 pub mod aperture_macro;
+mod clipper_bridge;
 pub mod dcode;
 pub mod evaluate;
 pub mod export;

@@ -1,4 +1,4 @@
-use super::vector::{rotate_point, Vec2I};
+use super::vector::{Vec2I, rotate_point};
 
 const MIN_SEGCOUNT_FOR_CIRCLE: f64 = 8.0;
 
@@ -20,9 +20,32 @@ pub fn circle_to_polygon(radius: i32, seg_count: usize) -> Vec<Vec2I> {
 }
 
 pub fn circle_to_polygon_by_error(radius: i32, error_max: i32) -> Vec<Vec2I> {
+    circle_to_polygon_by_error_location(radius, error_max, false)
+}
+
+pub fn circle_to_polygon_by_error_outside(radius: i32, error_max: i32) -> Vec<Vec2I> {
+    circle_to_polygon_by_error_location(radius, error_max, true)
+}
+
+fn circle_to_polygon_by_error_location(
+    radius: i32,
+    error_max: i32,
+    error_outside: bool,
+) -> Vec<Vec2I> {
     let mut count = get_arc_to_segment_count(radius, error_max, 360.0).max(8) as usize;
     count = count.div_ceil(8) * 8;
-    circle_to_polygon_count(radius, count)
+    let corrected_radius = if error_outside {
+        radius + circle_to_end_segment_delta_radius(radius, count)
+    } else {
+        radius
+    };
+    circle_to_polygon_count(corrected_radius, count)
+}
+
+fn circle_to_end_segment_delta_radius(radius: i32, segment_count: usize) -> i32 {
+    let segment_count = segment_count.max(3);
+    let alpha = std::f64::consts::PI / segment_count as f64;
+    (radius as f64 * (1.0 - 1.0 / alpha.cos())).abs().round() as i32
 }
 
 fn circle_to_polygon_count(radius: i32, count: usize) -> Vec<Vec2I> {
@@ -77,4 +100,18 @@ pub fn regular_polygon_to_polygon(radius: i32, edges: i32, rotation_degrees: f64
     }
 
     outline
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn outside_circle_matches_kicad_radius_correction() {
+        let outline = circle_to_polygon_by_error_outside(355_600, 500);
+
+        assert_eq!(outline.len(), 65);
+        assert_eq!(outline[0], Vec2I::new(355_600, 17_470));
+        assert_eq!(outline.last(), outline.first());
+    }
 }
