@@ -2,7 +2,12 @@
 
 use std::cmp::Ordering;
 
-use crate::clipper_bridge::{ClipperNode, ClipperOperation, ClipperTree};
+use i_overlay::core::fill_rule::FillRule;
+use i_overlay::core::overlay::{ContourDirection, IntOverlayOptions, Overlay, ShapeType};
+use i_overlay::core::overlay_rule::OverlayRule;
+use i_overlay::core::solver::Solver;
+use i_overlay::i_float::int::point::IntPoint;
+
 use crate::coord::Vec2I;
 
 const MIN_SEGCOUNT_FOR_CIRCLE: f64 = 8.0;
@@ -161,15 +166,15 @@ impl PolySet {
     }
 
     pub fn boolean_add(&mut self, other: &PolySet) {
-        *self = clipper_boolean_op(self, other, ClipperOperation::Union);
+        *self = overlay_boolean_op(self, other, OverlayRule::Union);
     }
 
     pub fn boolean_subtract(&mut self, other: &PolySet) {
-        *self = clipper_boolean_op(self, other, ClipperOperation::Difference);
+        *self = overlay_boolean_op(self, other, OverlayRule::Difference);
     }
 
     pub fn simplify(&mut self) {
-        *self = clipper_boolean_op(self, &PolySet::new(), ClipperOperation::Union);
+        *self = overlay_boolean_op(self, &PolySet::new(), OverlayRule::Union);
     }
 
     pub fn fracture(&mut self) {
@@ -287,25 +292,25 @@ fn signed_area2(points: &[Vec2I]) -> i64 {
     area
 }
 
-fn polyset_to_clipper_paths(polyset: &PolySet) -> Vec<Vec<Vec2I>> {
-    let mut paths = Vec::with_capacity(polyset.contour_count());
+fn polyset_to_overlay_contours(polyset: &PolySet) -> Vec<Vec<IntPoint<i32>>> {
+    let mut contours = Vec::with_capacity(polyset.contour_count());
 
     for poly in &polyset.polygons {
-        if let Some(outline) = contour_for_clipper(&poly.outline, true) {
-            paths.push(outline);
+        if let Some(outline) = contour_for_overlay(&poly.outline, true) {
+            contours.push(outline);
         }
 
         for hole in &poly.holes {
-            if let Some(hole) = contour_for_clipper(hole, false) {
-                paths.push(hole);
+            if let Some(hole) = contour_for_overlay(hole, false) {
+                contours.push(hole);
             }
         }
     }
 
-    paths
+    contours
 }
 
-fn contour_for_clipper(points: &[Vec2I], want_positive_area: bool) -> Option<Vec<Vec2I>> {
+fn contour_for_overlay(points: &[Vec2I], want_positive_area: bool) -> Option<Vec<IntPoint<i32>>> {
     let mut ring = Vec::with_capacity(points.len());
 
     for point in points.iter().copied() {
@@ -328,46 +333,57 @@ fn contour_for_clipper(points: &[Vec2I], want_positive_area: bool) -> Option<Vec
         ring.reverse();
     }
 
-    Some(ring)
+    Some(
+        ring.into_iter()
+            .map(|point| IntPoint::new(point.x, point.y))
+            .collect(),
+    )
 }
 
-fn clipper_boolean_op(subject: &PolySet, clip: &PolySet, operation: ClipperOperation) -> PolySet {
-    let subject_paths = polyset_to_clipper_paths(subject);
-    let clip_paths = polyset_to_clipper_paths(clip);
-    let tree = ClipperTree::execute(operation, &subject_paths, &clip_paths)
-        .expect("KiCad Clipper2 boolean operation failed");
-    polyset_from_clipper_tree(&tree)
-}
+fn overlay_boolean_op(subject: &PolySet, clip: &PolySet, rule: OverlayRule) -> PolySet {
+    let subject_contours = polyset_to_overlay_contours(subject);
+    let clip_contours = polyset_to_overlay_contours(clip);
+    let capacity = subject_contours
+        .iter()
+        .chain(&clip_contours)
+        .map(Vec::len)
+        .sum();
+    let options = IntOverlayOptions {
+        preserve_input_collinear: true,
+        output_direction: ContourDirection::CounterClockwise,
+        preserve_output_collinear: true,
+        min_output_area: 0,
+        ogc: false,
+    };
+    let mut overlay = Overlay::<i32>::new_custom(capacity, options, Solver::default());
 
-fn polyset_from_clipper_tree(tree: &ClipperTree) -> PolySet {
-    let mut polyset = PolySet::new();
-    let root = tree.root();
+    overlay.add_contours(&subject_contours, ShapeType::Subject);
+    overlay.add_contours(&clip_contours, ShapeType::Clip);
 
-    for child_index in 0..root.child_count() {
-        if let Some(child) = root.child(child_index) {
-            import_clipper_node(child, &mut polyset);
-        }
-    }
+    let polygons = overlay
+        .overlay(rule, FillRule::NonZero)
+        .into_iter()
+        .filter_map(|shape| {
+            let mut contours = shape.into_iter();
+            let outline = contours.next()?;
 
-    polyset
-}
+            Some(Polygon {
+                outline: outline
+                    .into_iter()
+                    .map(|point| Vec2I::new(point.x, point.y))
+                    .collect(),
+                holes: contours
+                    .map(|hole| {
+                        hole.into_iter()
+                            .map(|point| Vec2I::new(point.x, point.y))
+                            .collect()
+                    })
+                    .collect(),
+            })
+        })
+        .collect();
 
-fn import_clipper_node(node: ClipperNode<'_>, polyset: &mut PolySet) {
-    let mut polygon = Polygon::with_outline(node.points());
-
-    for child_index in 0..node.child_count() {
-        if let Some(hole) = node.child(child_index) {
-            polygon.holes.push(hole.points());
-
-            for grandchild_index in 0..hole.child_count() {
-                if let Some(grandchild) = hole.child(grandchild_index) {
-                    import_clipper_node(grandchild, polyset);
-                }
-            }
-        }
-    }
-
-    polyset.polygons.push(polygon);
+    PolySet { polygons }
 }
 
 #[derive(Clone, Copy, Default)]

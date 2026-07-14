@@ -1,7 +1,6 @@
 pub mod am_param;
 pub mod am_primitive;
 pub mod aperture_macro;
-mod clipper_bridge;
 pub mod coord;
 pub mod dcode;
 pub mod draw_item;
