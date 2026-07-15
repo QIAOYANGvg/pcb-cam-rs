@@ -1,0 +1,13 @@
+[package]
+name = "gerber-render-wgpu"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bytemuck = { version = "1.25.1", features = ["derive"] }
+gerber-render-plan = { path = "../gerber-render-plan" }
+lyon_path = "1.0.19"
+lyon_tessellation = "1.0.20"
+pollster = "1.0.1"
+thiserror = "2.0.18"
+wgpu = "29.0.1"

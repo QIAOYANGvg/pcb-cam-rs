@@ -26,6 +26,14 @@ improves traceability. Project-specific infrastructure is grouped separately.
   generation. These replace KiCad infrastructure spread across `kimath` and
   GerbView.
 - `export/` contains project-specific serializers and validation output.
+- `crates/gerber-render-plan/` converts parsed Gerber items into ordered,
+  backend-neutral rendering operations. Its public IR owns its coordinate,
+  bounds, and polygon types.
+- `crates/gerber-render-wgpu/` provides the headless WGPU backend, including
+  Lyon tessellation, MSAA rendering, and RGBA texture readback. It depends only
+  on `gerber-render-plan`.
+- `crates/gerber-cli/` owns command parsing, parser/renderer composition, JSON
+  export, and PNG encoding. The produced executable remains `gerber-parse`.
 - `cpp/` contains the active C ABI bridge to the exact Clipper2 engine.
 - `vendor/clipper2/` contains the project-local Clipper2 source and license.
 - `test-corpus/` contains the tracked Gerber corpus, source license, and

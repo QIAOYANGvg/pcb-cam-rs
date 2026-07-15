@@ -1,5 +1,6 @@
 /target/
 /validation-results/
+/images/
 /tools/kicad-exporter/*.lib
 __pycache__/
 *.py[cod]

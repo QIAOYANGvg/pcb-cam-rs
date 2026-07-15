@@ -1,0 +1,15 @@
+[package]
+name = "gerber-cli"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "gerber-parse"
+path = "src/main.rs"
+
+[dependencies]
+gerber-parse = { path = "../.." }
+gerber-render-plan = { path = "../gerber-render-plan" }
+gerber-render-wgpu = { path = "../gerber-render-wgpu" }
+png = "0.18.1"
+serde_json = "1.0"
